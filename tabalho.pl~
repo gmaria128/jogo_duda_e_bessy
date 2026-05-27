@@ -1,0 +1,21 @@
+duda_tem(X).
+duda_tem(nada).
+duda_esta(X).
+duda_esta(patio).
+pode_ir(X, Y).
+pode_ir(X, Y):- duda_tem(X), X==banho, pode_ir(patio, casa), nl.
+pode_ir(X, Y):- duda_tem(X), X\==banho, write("duda não pode entrar na casa da Dona Lurdes sem ter tomado banho.").
+pode_ir(casa, patio).
+pode_ir(patio, lagoa).
+pode_ir(lagoa, patio).
+pode_ir(patio, galinheiro).
+pode_ir(galineiro, patio).
+pode_ir(patio, floresta).
+pode_ir(floresta, patio).
+vai_para(X).
+pegar(X).
+termina.
+rodar.
+
+rodar(duda_tem(bessy)).
+rodar(X):- duda_tem\==bessy,
