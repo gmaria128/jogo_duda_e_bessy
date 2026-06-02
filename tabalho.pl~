@@ -14,8 +14,14 @@ pode_ir(patio, floresta).
 pode_ir(floresta, patio).
 vai_para(X).
 pegar(X).
+pegar(X):- duda_esta(X), X== lagoa, pegar(banho), nl.
+pegar(X):- duda_esta(X), X\== lagoa, write("duda não pode pegar banho fora da lagoa.").
+pegar(X):- duda_esta(X), X== floresta, duda_tem(X), X==rede, pegar(bessy), nl.
+pegar(X):- duda_esta(X), X\== floresta, write("duda não pode pegar a bessy fora da floresta").
+pegar(X):- duda_tem(X), X\== rede, write("duda não pode pegar a bessy sem a rede. a Bessy é muito rápida").
 termina.
 rodar.
 
 rodar(duda_tem(bessy)).
-rodar(X):- duda_tem\==bessy,
+rodar(X):- duda_tem\==bessy.
+
