@@ -1,3 +1,6 @@
+:- dynamic duda_tem/1.
+:- dynamic duda_esta/1.
+
 duda_tem(X).
 duda_tem(nada).
 duda_esta(X).
@@ -15,13 +18,32 @@ pode_ir(floresta, patio).
 vai_para(X).
 pegar(X).
 pegar(X):- duda_esta(X), X== lagoa, pegar(banho), nl.
-pegar(X):- duda_esta(X), X\== lagoa, write("duda não pode pegar banho fora da lagoa.").
+pegar(X):- duda_esta(X), X\== lagoa, write("duda não pode pegar banho fora da lagoa."), nl.
 pegar(X):- duda_esta(X), X== floresta, duda_tem(X), X==rede, pegar(bessy), nl.
-pegar(X):- duda_esta(X), X\== floresta, write("duda não pode pegar a bessy fora da floresta").
-pegar(X):- duda_tem(X), X\== rede, write("duda não pode pegar a bessy sem a rede. a Bessy é muito rápida").
+pegar(X):- duda_esta(X), X\== floresta, write("duda não pode pegar a bessy fora da floresta"), nl.
+pegar(X):- duda_tem(X), X\== rede, write("duda não pode pegar a bessy sem a rede. a Bessy é muito rápida"), nl.
 termina.
 rodar.
 
 rodar(duda_tem(bessy)).
 rodar(X):- duda_tem\==bessy.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
