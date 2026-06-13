@@ -5,7 +5,7 @@ duda_tem(Objeto)
 :-call(duda_tem(Objeto).
 assert(duda_esta(patio)).
 pode_ir(X, Y).
-ode_ir(patio, casa).
+pode_ir(patio, casa).
 pode_ir(casa, patio).
 pode_ir(patio, lagoa).
 pode_ir(lagoa, patio).
