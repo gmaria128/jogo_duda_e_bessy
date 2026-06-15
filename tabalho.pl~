@@ -1,23 +1,17 @@
 :- dynamic duda_possui/1.
 :- dynamic local_duda/1.
 
-/* --------------------------------------------
-   Laço principal
--------------------------------------------- */
+%loop Principal
 rodar :-
     finalizado.
 rodar :-
     read(X),
     (call(X), rodar).
 
-/* --------------------------------------------
-   Estado inicial do jogo
--------------------------------------------- */
+
 local_duda(patio).
 
-/* --------------------------------------------
-   Locais acessíveis entre si
--------------------------------------------- */
+%diagrama
 acessivel(patio, hospital).
 acessivel(patio, casa).
 acessivel(patio, floresta).
@@ -29,11 +23,9 @@ acessivel(floresta, patio).
 acessivel(casa, patio).
 acessivel(hospital, patio).
 
-/* ============================================
-   FINAIS POSSÍVEIS
-============================================ */
 
-% Duda leva Bessy para o galinheiro mesmo amando os animais
+%Fins
+% Duda leva Bessy para o galinheiro depois de ter tomado vacina
 finalizado :-
     duda_possui(vacina),
     local_duda(galinheiro),
@@ -66,9 +58,7 @@ finalizado :-
     retract(duda_possui(rede)),
     retract(duda_possui(banho)).
 
-/* ============================================
-   PEGAR OBJETOS
-============================================ */
+%Pegar objetos
 
 % Bessy
 pegar(bessy) :-
@@ -146,10 +136,7 @@ pegar(vacina) :-
 pegar(_) :-
     write("Esse objeto não existe."), nl.
 
-/* ============================================
-   MOVIMENTAÇÃO ENTRE LOCAIS
-============================================ */
-
+%Ir para locais
 % Caso já esteja no local
 ir_para(X) :-
     local_duda(Y),
@@ -277,7 +264,7 @@ ir_para(patio) :-
     not(duda_possui(vacina)),
     retract(local_duda(hospital)),
     assert(local_duda(patio)),
-    write("A voz do tio conservador de Duda soa em seus ouvidos 'Dudinha, nunca tome vacina, pois um tio de um amigo meu tomou e virou jacaré'."), nl,
+    write("A voz do tio conservador de Duda soa em seus ouvidos 'Dudinha, nunca tome vacina, pois o tio de um amigo meu tomou e virou jacaré'."), nl,
     write("Duda está no pátio."), nl.
 
 
