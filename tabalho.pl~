@@ -270,6 +270,17 @@ ir_para(casa) :-
     write("Caminho inacessível."), nl.
 
 % Pátio
+
+ir_para(patio) :-
+    local_duda(hospital),
+    acessivel(hospital, patio),
+    not(duda_possui(vacina)),
+    retract(local_duda(hospital)),
+    assert(local_duda(patio)),
+    write("A voz do tio conservador de Duda soa em seus ouvidos 'Dudinha, nunca tome vacina, pois um tio de um amigo meu tomou e virou jacaré'."), nl,
+    write("Duda está no pátio."), nl.
+
+
 ir_para(patio) :-
     local_duda(X),
     acessivel(X, patio),
