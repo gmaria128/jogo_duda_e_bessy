@@ -1,27 +1,285 @@
-:- dynamic duda_tem/1.
-:- dynamic duda_esta/1.
+:- dynamic duda_possui/1.
+:- dynamic local_duda/1.
 
-duda_tem(Objeto)
-:-call(duda_tem(Objeto).
-assert(duda_esta(patio)).
-pode_ir(X, Y).
-pode_ir(patio, casa).
-pode_ir(casa, patio).
-pode_ir(patio, lagoa).
-pode_ir(lagoa, patio).
-pode_ir(patio, galinheiro).
-pode_ir(galineiro, patio).
-pode_ir(patio, floresta).
-pode_ir(floresta, patio).
-vai_para(A).
-pegar(B).
-pegar(B):- duda_esta(X), X== lagoa, pegar(banho), nl.
-pegar(B):- duda_esta(X), X\== lagoa, write("duda não pode pegar banho fora da lagoa."), nl.
-pegar(B):- duda_esta(X), X== floresta, duda_tem(X), X==rede, pegar(bessy), nl.
-pegar(B):- duda_esta(X), X\== floresta, write("duda não pode pegar a bessy fora da floresta"), nl.
-pegar(B):- duda_tem(X), X\== rede, write("duda não pode pegar a bessy sem a rede. a Bessy é muito rápida"), nl.
-termina.
-rodar.
+/* --------------------------------------------
+   Laço principal
+-------------------------------------------- */
+rodar :-
+    finalizado.
+rodar :-
+    read(X),
+    (call(X), rodar).
 
-rodar(duda_tem(bessy)).
-rodar(X):- duda_tem\==bessy.
+/* --------------------------------------------
+   Estado inicial do jogo
+-------------------------------------------- */
+local_duda(patio).
+
+/* --------------------------------------------
+   Locais acessíveis entre si
+-------------------------------------------- */
+acessivel(patio, hospital).
+acessivel(patio, casa).
+acessivel(patio, floresta).
+acessivel(patio, galinheiro).
+acessivel(patio, lagoa).
+acessivel(lagoa, patio).
+acessivel(galinheiro, patio).
+acessivel(floresta, patio).
+acessivel(casa, patio).
+acessivel(hospital, patio).
+
+/* ============================================
+   FINAIS POSSÍVEIS
+============================================ */
+
+% Duda leva Bessy para o galinheiro mesmo amando os animais
+finalizado :-
+    duda_possui(vacina),
+    local_duda(galinheiro),
+    duda_possui(bessy),
+
+    write("Duda sabe o perigo que a mordida de um animal selvagem pode causar, e se previniu tomando uma vacina nos hospital. "),
+    write("Ela conseguiu comprir seu objetivo e se manteve segura"), nl,
+    write("A dona Lurdes lhe entrega o dinheiro e ela vai embora feliz!"), nl,
+
+    retract(local_duda(galinheiro)),
+    assert(local_duda(patio)),
+
+    retract(duda_possui(vacina)),
+    retract(duda_possui(bessy)),
+    retract(duda_possui(rede)),
+    retract(duda_possui(banho)).
+
+% Duda leva Bessy para o galinheiro sem vacina
+finalizado :-
+    local_duda(galinheiro),
+    duda_possui(bessy),
+
+    write("Duda trouxe a Bessy de volta ao galinheiro, mas como não tomou vacina pegou uma doença incuravel."), nl,
+    write("A dona Lurdes lhe entregou o dinheiro mas Duda passou mal, antes de conseguir ultilizar o dinheiro."), nl,
+
+    retract(local_duda(galinheiro)),
+    assert(local_duda(patio)),
+
+    retract(duda_possui(bessy)),
+    retract(duda_possui(rede)),
+    retract(duda_possui(banho)).
+
+/* ============================================
+   PEGAR OBJETOS
+============================================ */
+
+% Bessy
+pegar(bessy) :-
+    local_duda(floresta),
+    duda_possui(rede),
+    not(duda_possui(bessy)),
+    assert(duda_possui(bessy)),
+    write("Com ajuda da rede Duda consegue capturar a Bessy com sucesso."), nl.
+
+pegar(bessy) :-
+    local_duda(floresta),
+    not(duda_possui(bessy)),
+    write("A Bessy é muito rápida e parece que não quer ser pega de jeito nenhum."), nl,
+    write("Duda precisa da rede para conseguir pegar ela!"), nl.
+
+pegar(bessy) :-
+    duda_possui(bessy),
+    write("Duda já capturou a Bessy!"), nl.
+
+pegar(bessy) :-
+    write("A Bessy está na floresta."), nl.
+
+% Rede
+pegar(rede) :-
+    local_duda(casa),
+    not(duda_possui(rede)),
+    assert(duda_possui(rede)),
+    write("Duda pegou a rede."), nl.
+
+pegar(rede) :-
+    duda_possui(rede),
+    write("Duda já pegou a rede!"), nl.
+
+pegar(rede) :-
+    write("A rede não está aqui."), nl,
+    write("Duda irá encontrar a rede dentro da casa de dona Lurdes!"), nl.
+
+% Banho
+pegar(banho) :-
+    local_duda(lagoa),
+    not(duda_possui(banho)),
+    assert(duda_possui(banho)),
+    write("Banho tomado!"), nl.
+
+pegar(banho) :-
+    duda_possui(banho),
+    write("Duda já tomou banho!"), nl.
+
+pegar(banho) :-
+    write("Duda precisa ir para a lagoa para tomar banho!"), nl.
+
+% Vacina
+pegar(vacina) :-
+    not(duda_possui(bessy)),
+    not(duda_possui(vacina)),
+    local_duda(hospital),
+    assert(duda_possui(vacina)),
+    write("Mesmo com o tio conservador de Duda, a alertando sobre os perigos da vacina, após tomar essa Vacina ela está se sentindo muito mais segura."), nl.
+
+pegar(vacina) :-
+    not(duda_possui(bessy)),
+    not(duda_possui(vacina)),
+    not(local_duda(hospital)),
+    write("Duda só consegue pegar a Vacina no hospita."), nl.
+
+
+pegar(vacina) :-
+    duda_possui(vacina),
+    write("Duda já está vacinada, agora pode ir atrás da Bessy sem medo."), nl.
+
+pegar(vacina) :-
+    write("A voz do tio conservador de Duda soa em seus ouvidos 'Vacina não serve para nada, e so uma forma do governo colocar rastreadores e nos manipular'."), nl.
+
+% Objeto inexistente
+pegar(_) :-
+    write("Esse objeto não existe."), nl.
+
+/* ============================================
+   MOVIMENTAÇÃO ENTRE LOCAIS
+============================================ */
+
+% Caso já esteja no local
+ir_para(X) :-
+    local_duda(Y),
+    X == Y,
+    write("Duda já está nesse local."), nl.
+
+% Hospital
+ir_para(hospital) :-
+    duda_possui(vacina),
+    not(duda_possui(bessy)),
+    local_duda(X),
+    acessivel(X, hospital),
+    retract(local_duda(patio)),
+    assert(local_duda(hospital)).
+
+ir_para(hospital) :-
+    duda_possui(bessy),
+    local_duda(X),
+    acessivel(X, hospital),
+    write("Vish, agora é tarde para se previnir, Duda já está doente."), nl.
+
+ir_para(hospital) :-
+    not(duda_possui(vacina)),
+    not(duda_possui(bessy)),
+    local_duda(X),
+    acessivel(X, hospital),
+    retract(local_duda(patio)),
+    assert(local_duda(hospital)),
+    write("Um panfleto voa até as mãos de Duda, e ela ve que está tendo uma epidemia. Ela ve uma fila de pessoas esperando para tomar vacina."), nl.
+
+
+ir_para(hospital) :-
+    write("Caminho inacessível."), nl.
+
+% Lagoa
+ir_para(lagoa) :-
+    local_duda(X),
+    acessivel(X, lagoa),
+    retract(local_duda(patio)),
+    assert(local_duda(lagoa)),
+    write("Duda chega na lagoa."), nl.
+
+ir_para(lagoa) :-
+    write("Caminho inacessível."), nl.
+
+% Floresta
+ir_para(floresta) :-
+    duda_possui(bessy),
+    local_duda(X),
+    acessivel(X, floresta),
+    retract(local_duda(patio)),
+    assert(local_duda(floresta)),
+    write("Duda chega na floresta."), nl.
+
+ir_para(floresta) :-
+    duda_possui(vacina),
+    local_duda(X),
+    acessivel(X, floresta),
+    retract(local_duda(patio)),
+    assert(local_duda(floresta)),
+    write("Duda chega na floresta, mas não sente medo, pois está vacinada."), nl.
+
+ir_para(floresta) :-
+    local_duda(X),
+    acessivel(X, floresta),
+    retract(local_duda(patio)),
+    assert(local_duda(floresta)),
+    write("Duda chega na floresta, mas está apavorada!"), nl,
+    write("Algum bicho mordeu ela e ela só quer levar bessy para dona Lurdes, para poder descançar em casa."), nl.
+
+ir_para(floresta) :-
+    write("Caminho inacessível."), nl.
+
+% Galinheiro
+ir_para(galinheiro) :-
+    duda_possui(vacina),
+    duda_possui(bessy),
+    local_duda(X),
+    acessivel(X, galinheiro),
+    retract(local_duda(patio)),
+    assert(local_duda(galinheiro)).
+
+ir_para(galinheiro) :-
+    duda_possui(bessy),
+    local_duda(X),
+    acessivel(X, galinheiro),
+    retract(local_duda(patio)),
+    assert(local_duda(galinheiro)).
+
+ir_para(galinheiro) :-
+    write("Caminho inacessível."), nl.
+
+% Casa
+ir_para(casa) :-
+    duda_possui(banho),
+    duda_possui(rede),
+    local_duda(X),
+    acessivel(X, casa),
+    retract(local_duda(patio)),
+    assert(local_duda(casa)),
+    write("Duda entra na casa de dona Lurdes, mas você já pegou a rede."), nl,
+    write("Não há mais o que fazer aqui!"), nl.
+
+ir_para(casa) :-
+    duda_possui(banho),
+    local_duda(X),
+    acessivel(X, casa),
+    retract(local_duda(patio)),
+    assert(local_duda(casa)),
+    write("Você entra na casa de dona Lurdes e vê a rede em cima do balcão."), nl.
+
+ir_para(casa) :-
+    not(duda_possui(banho)),
+    write("A dona Lurdes não deixa você entrar na sua casa limpinha com os pés sujos."), nl,
+    write("Vá para a lagoa tomar um banho."), nl.
+
+ir_para(casa) :-
+    write("Caminho inacessível."), nl.
+
+% Pátio
+ir_para(patio) :-
+    local_duda(X),
+    acessivel(X, patio),
+    retract(local_duda(X)),
+    assert(local_duda(patio)),
+    write("Duda está no pátio."), nl.
+
+ir_para(patio) :-
+    write("Caminho inacessível."), nl.
+
+% Local inexistente
+ir_para(_) :-
+    write("Esse local não existe."), nl.
